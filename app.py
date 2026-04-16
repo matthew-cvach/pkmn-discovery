@@ -82,19 +82,25 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* HARD CENTERING for Checkbox */
-    /* This targets the specific div Streamlit uses for checkboxes */
+    /* THE FIX: Deep Centering for Checkbox */
+    /* Target the base widget container */
     [data-testid="stCheckbox"] {
-        display: flex;
-        justify-content: center;
+        display: flex !important;
+        justify-content: center !important;
         width: 100% !important;
-        padding-left: 0px;
     }
-    /* Removes the internal padding that offsets the box to the left */
+    /* Target the internal flex container that holds the box and the (empty) label */
     [data-testid="stCheckbox"] > label {
-        margin-left: auto;
-        margin-right: auto;
-        padding-left: 0px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    /* Remove the default margin-right that Streamlit adds to the checkbox icon */
+    [data-testid="stCheckbox"] div[role="checkbox"] {
+        margin-right: 0px !important;
     }
     
     /* Style the Button */
