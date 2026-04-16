@@ -4,15 +4,15 @@ import numpy as np
 import random
 import os
 import re
+import base64
 
 # --- 1. PAGE CONFIG & STYLING ---
 st.set_page_config(page_title="Pokémon Discovery", layout="wide")
 
-# Custom CSS for your specific layout requests
 st.markdown("""
     <style>
     /* Force all text to white */
-    html, body, [data-testid="stWidgetLabel"], .stApp, p, h1, h2, h3 { 
+    html, body, [data-testid="stWidgetLabel"], .stApp, p, h1, h2, h3, span, div { 
         color: white !important; 
     }
     
@@ -38,8 +38,8 @@ st.markdown("""
     .img-circle {
         background-color: white;
         border-radius: 50%;
-        width: 400px;
-        height: 400px;
+        width: 350px;
+        height: 350px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -50,13 +50,14 @@ st.markdown("""
     
     /* Ensure the image inside the circle looks correct */
     .img-circle img {
-        max-width: 80% !important;
-        height: auto !important;
+        max-width: 85%;
+        max-height: 85%;
+        object-fit: contain;
     }
 
     /* Slider Thickness & Alignment */
     .stSlider [data-baseweb="slider"] {
-        height: 25px !important; /* Even thicker */
+        height: 25px !important; 
     }
     
     /* Center the slider thumb (handle) */
@@ -66,12 +67,11 @@ st.markdown("""
         height: 25px !important;
     }
 
-    /* Aggressive Hiding of numbers and labels */
-    [data-testid="stWidgetLabel"], 
-    [data-testid="stThumbValue"], 
-    [data-testid="stSliderTickBar"],
-    .st-at, .st-ae { 
+    /* Target specifically the thumb value (number) to hide it safely */
+    div[data-testid="stThumbValue"], 
+    div[data-testid="stSliderTickBar"] { 
         display: none !important; 
+        opacity: 0 !important;
     }
     
     /* Side labels leveled with the thick slider */
@@ -82,7 +82,7 @@ st.markdown("""
         margin-top: 18px; 
     }
     
-    /* Centering the button with the column content */
+    /* Centering the button */
     .stButton {
         display: flex;
         justify-content: center;
@@ -92,7 +92,6 @@ st.markdown("""
     
     .stButton button {
         background-color: #333 !important;
-        color: white !important;
         border-radius: 25px !important;
         padding: 12px 40px !important;
         border: 1px solid #555 !important;
@@ -100,12 +99,22 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. DATA LOAD ---
+# --- 2. DATA LOAD & HELPERS ---
 @st.cache_data
 def load_data():
     return pd.read_csv('top_10_pokemon_mappings.csv')
 
 df_maps = load_data()
+
+# Helper to convert images to HTML-safe text so they stay inside the div
+def get_image_html(image_path, ext):
+    with open(image_path, "rb") as img_file:
+        encoded_string = base64.b64encode(img_file.read()).decode()
+    return f'''
+        <div class="img-circle">
+            <img src="data:image/{ext};base64,{encoded_string}">
+        </div>
+    '''
 
 TRAIT_LABELS = {
     'complexity': ('Simple', 'Complex'),
@@ -122,10 +131,18 @@ TRAIT_LABELS = {
 # --- 3. LOGIC & INITIALIZATION ---
 current_combo = df_maps['combination'].unique()[0]
 
-# Initialize Session States
+# Initialize Session States safely
 for i in range(1, 5):
     if f's{i}' not in st.session_state: st.session_state[f's{i}'] = 3
 if 's5' not in st.session_state: st.session_state.s5 = 2
+
+# Callback function for the randomize button
+def randomize_traits():
+    st.session_state.s1 = random.randint(1, 5)
+    st.session_state.s2 = random.randint(1, 5)
+    st.session_state.s3 = random.randint(1, 5)
+    st.session_state.s4 = random.randint(1, 5)
+    st.session_state.s5 = random.choice([2, 4])
 
 # --- 4. UI LAYOUT ---
 st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; margin-bottom:60px;'>POKÉMON DISCOVERY</h1>", unsafe_allow_html=True)
@@ -154,14 +171,8 @@ with col2:
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     v5 = trait_row(TRAIT_LABELS[attrs[4]], "s5", is_select=True)
 
-    # The button is now nested inside this column to ensure centering with the sliders
-    if st.button('RANDOMIZE TRAITS'):
-        st.session_state.s1 = random.randint(1, 5)
-        st.session_state.s2 = random.randint(1, 5)
-        st.session_state.s3 = random.randint(1, 5)
-        st.session_state.s4 = random.randint(1, 5)
-        st.session_state.s5 = random.choice([2, 4])
-        st.rerun()
+    # Use the callback (on_click) so session state updates BEFORE sliders render
+    st.button('RANDOMIZE TRAITS', on_click=randomize_traits)
 
 with col1:
     match = df_maps[
@@ -182,10 +193,9 @@ with col1:
         for ext in ['png', 'jpg', 'jpeg', 'webp']:
             img_path = f"pokemon_artwork/{p['pokeapi_name_fixed']}.{ext}"
             if os.path.exists(img_path):
-                # FIXED IMAGE DISPLAY logic: One container, one image call.
-                st.markdown('<div class="img-circle">', unsafe_allow_html=True)
-                st.image(img_path, use_column_width=False, width=320)
-                st.markdown('</div>', unsafe_allow_html=True)
+                # We use pure HTML/Base64 to guarantee the image stays IN the circle
+                html_block = get_image_html(img_path, ext)
+                st.markdown(html_block, unsafe_allow_html=True)
                 img_found = True
                 break
         
