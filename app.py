@@ -11,14 +11,18 @@ st.set_page_config(page_title="Pokémon Discovery", layout="wide")
 # Custom CSS for your specific layout requests
 st.markdown("""
     <style>
+    /* Force all text to white */
+    html, body, [data-testid="stWidgetLabel"], .stApp, p, h1, h2, h3 { 
+        color: white !important; 
+    }
+    
     /* Dark Background */
-    .stApp { background-color: #1a1a1a; color: white; }
+    .stApp { background-color: #1a1a1a; }
     
     /* Remove the 'link' icon next to headers */
-    .stApp [data-testid="stHeaderActionElements"] { display: none; }
-    button[data-testid="baseLinkButton"] { display: none; }
+    .stApp [data-testid="stHeaderActionElements"],
+    button[data-testid="baseLinkButton"],
     a.anchor-link { display: none !important; }
-    h1 a, h2 a, h3 a { visibility: hidden; }
 
     /* Pokémon Name Styling */
     .pkmn-name { 
@@ -27,7 +31,6 @@ st.markdown("""
         text-align: center; 
         text-transform: uppercase; 
         letter-spacing: -1px; 
-        color: white; 
         margin-top: 20px;
     }
     
@@ -44,41 +47,55 @@ st.markdown("""
         border: 4px solid #444;
         overflow: hidden;
     }
+    
+    /* Ensure the image inside the circle looks correct */
+    .img-circle img {
+        max-width: 80% !important;
+        height: auto !important;
+    }
 
     /* Slider Thickness & Alignment */
     .stSlider [data-baseweb="slider"] {
-        height: 18px; /* Thicker track */
+        height: 25px !important; /* Even thicker */
     }
-    /* Fixing the thumb (circle) vertical alignment */
+    
+    /* Center the slider thumb (handle) */
     .stSlider [data-baseweb="thumb"] {
-        top: 2px !important; 
+        top: 5px !important; 
+        width: 25px !important;
+        height: 25px !important;
     }
 
-    /* Hide ALL numbers/labels above sliders */
-    [data-testid="stWidgetLabel"] { display: none; }
-    [data-testid="stThumbValue"] { display: none; }
-    [data-testid="stSliderTickBar"] { display: none; }
+    /* Aggressive Hiding of numbers and labels */
+    [data-testid="stWidgetLabel"], 
+    [data-testid="stThumbValue"], 
+    [data-testid="stSliderTickBar"],
+    .st-at, .st-ae { 
+        display: none !important; 
+    }
     
-    /* Styling for the side labels to be level with sliders */
+    /* Side labels leveled with the thick slider */
     .side-label {
         font-size: 13px;
         font-weight: 700;
-        color: #bbb;
         text-transform: uppercase;
-        margin-top: 12px; /* Adjusted to level with thicker slider */
+        margin-top: 18px; 
     }
     
-    /* Center the button */
+    /* Centering the button with the column content */
     .stButton {
         display: flex;
         justify-content: center;
-        margin-top: 30px;
+        width: 100%;
+        margin-top: 40px;
     }
+    
     .stButton button {
         background-color: #333 !important;
         color: white !important;
-        border-radius: 20px !important;
-        padding: 10px 30px !important;
+        border-radius: 25px !important;
+        padding: 12px 40px !important;
+        border: 1px solid #555 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -119,10 +136,8 @@ with col2:
     meta = df_maps[df_maps['combination'] == current_combo].iloc[0]
     attrs = [meta[f'attr{i}_name'] for i in range(1, 6)]
     
-    # Sliders with side labels
     def trait_row(label_pair, key, is_select=False):
-        # Adding vertical padding/spacing using markdown
-        st.markdown("<div style='margin-bottom: 25px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
         l_col, m_col, r_col = st.columns([1.2, 3, 1.2])
         l_col.markdown(f"<p class='side-label' style='text-align:right;'>{label_pair[0]}</p>", unsafe_allow_html=True)
         with m_col:
@@ -139,7 +154,7 @@ with col2:
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     v5 = trait_row(TRAIT_LABELS[attrs[4]], "s5", is_select=True)
 
-    # Centered Randomize Button
+    # The button is now nested inside this column to ensure centering with the sliders
     if st.button('RANDOMIZE TRAITS'):
         st.session_state.s1 = random.randint(1, 5)
         st.session_state.s2 = random.randint(1, 5)
@@ -149,7 +164,6 @@ with col2:
         st.rerun()
 
 with col1:
-    # --- MATCHING LOGIC ---
     match = df_maps[
         (df_maps['combination'] == current_combo) &
         (df_maps['attr1_val'] == v1) &
@@ -162,24 +176,16 @@ with col1:
     if not match.empty:
         p = match.iloc[0]
         clean_name = re.sub(r'(?i)standard\s*', '', p['pokemon']).strip('- ').title()
-        
-        # Name and Circle aligned horizontally in this column
         st.markdown(f'<h1 class="pkmn-name">{clean_name}</h1>', unsafe_allow_html=True)
         
         img_found = False
         for ext in ['png', 'jpg', 'jpeg', 'webp']:
             img_path = f"pokemon_artwork/{p['pokeapi_name_fixed']}.{ext}"
             if os.path.exists(img_path):
-                st.markdown(f'''
-                    <div class="img-circle">
-                        <img src="data:image/{ext};base64,{os.path.exists(img_path)}" style="width: 85%; height: auto;">
-                    </div>
-                ''', unsafe_allow_html=True)
-                # We use standard st.image inside the circle container for better cloud compatibility
-                with st.container():
-                    st.markdown('<div class="img-circle">', unsafe_allow_html=True)
-                    st.image(img_path, use_column_width=False, width=320)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                # FIXED IMAGE DISPLAY logic: One container, one image call.
+                st.markdown('<div class="img-circle">', unsafe_allow_html=True)
+                st.image(img_path, use_column_width=False, width=320)
+                st.markdown('</div>', unsafe_allow_html=True)
                 img_found = True
                 break
         
