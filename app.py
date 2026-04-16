@@ -67,14 +67,10 @@ st.markdown("""
     }
 
     /* Nuke thumb values and keep tick bars invisible */
-    div[data-testid="stThumbValue"] { 
-        display: none !important; 
-    }
-    div[data-testid="stTickBar"] > div {
-        color: transparent !important;
-    }
+    div[data-testid="stThumbValue"] { display: none !important; }
+    div[data-testid="stTickBar"] > div { color: transparent !important; }
 
-    /* Side labels and Traits title size matching */
+    /* Text Styling */
     .side-label, .traits-title, .pretty-label {
         font-size: 13px;
         font-weight: 700;
@@ -82,34 +78,23 @@ st.markdown("""
         letter-spacing: 2px;
     }
     
-    .side-label {
-        margin-top: 15px; 
-    }
-    
-    .traits-title {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+    .side-label { margin-top: 15px; }
+    .traits-title { text-align: center; margin-bottom: 30px; }
+    .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* Centering the Checkbox and Label */
-    .pretty-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        margin-top: 30px;
-    }
-
-    /* Remove default streamlit margins from the checkbox widget specifically */
+    /* HARD CENTERING for Checkbox */
+    /* This targets the specific div Streamlit uses for checkboxes */
     [data-testid="stCheckbox"] {
-        width: fit-content;
-        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        width: 100% !important;
+        padding-left: 0px;
     }
-    
-    .pretty-label {
-        text-align: center;
-        margin-bottom: 5px;
+    /* Removes the internal padding that offsets the box to the left */
+    [data-testid="stCheckbox"] > label {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0px !important;
     }
     
     /* Style the Button */
@@ -172,8 +157,8 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # MOVE DOWN: Vertical spacer (approx 2 inches / 200px)
-    st.markdown("<div style='height: 200px;'></div>", unsafe_allow_html=True)
+    # MOVE DOWN: Vertical spacer (approx 1 inch / 100px)
+    st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
     
@@ -194,13 +179,9 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # Pretty Section: Centered Label + Centered Checkbox below it
+    # Pretty Section
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
-    # Using a 1:1:1 column split helps force the checkbox to stay center aligned with the label
-    _, cb_col, _ = st.columns([2.15, 1, 2]) 
-    with cb_col:
-        is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
-    
+    is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     v5 = 4 if is_pretty else 2
 
     st.markdown("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
