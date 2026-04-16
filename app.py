@@ -24,22 +24,23 @@ st.markdown("""
     button[data-testid="baseLinkButton"],
     a.anchor-link { display: none !important; }
 
-    /* Pokémon Name Styling */
+    /* Pokémon Name Styling (LARGER) */
     .pkmn-name { 
-        font-size: 3.5em; 
+        font-size: 4.5em; 
         font-weight: 900; 
         text-align: center; 
         text-transform: uppercase; 
         letter-spacing: -1px; 
         margin-top: 20px;
+        margin-bottom: 10px;
     }
     
-    /* The White Circle Container */
+    /* The White Circle Container (LARGER) */
     .img-circle {
         background-color: white;
         border-radius: 50%;
-        width: 350px;
-        height: 350px;
+        width: 450px; 
+        height: 450px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -48,7 +49,7 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* Ensure the image inside the circle looks correct */
+    /* Ensure the image inside the circle scales up */
     .img-circle img {
         max-width: 85%;
         max-height: 85%;
@@ -67,34 +68,63 @@ st.markdown("""
         height: 25px !important;
     }
 
-    /* Target specifically the thumb value (number) to hide it safely */
-    div[data-testid="stThumbValue"], 
-    div[data-testid="stSliderTickBar"] { 
+    /* Nuke the floating thumb values completely */
+    div[data-testid="stThumbValue"] { 
         display: none !important; 
         opacity: 0 !important;
     }
     
+    /* Keep the visual tick marks, but make the text numbers under them invisible */
+    div[data-testid="stTickBar"] > div {
+        color: transparent !important;
+        user-select: none;
+    }
+
     /* Side labels leveled with the thick slider */
     .side-label {
         font-size: 13px;
         font-weight: 700;
         text-transform: uppercase;
-        margin-top: 18px; 
+        margin-top: 15px; 
     }
     
-    /* Centering the button */
-    .stButton {
+    /* Traits Header */
+    .traits-title {
+        text-align: center;
+        letter-spacing: 5px;
+        font-weight: 300;
+        font-size: 2em;
+        margin-bottom: 30px;
+        margin-top: 10px;
+    }
+
+    /* Centering and styling the Checkbox */
+    .stCheckbox {
         display: flex;
         justify-content: center;
-        width: 100%;
-        margin-top: 40px;
+        margin-top: 15px;
+        margin-bottom: 25px;
+    }
+    .stCheckbox label {
+        font-size: 1.4em !important;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    /* Enlarge the actual checkbox box slightly */
+    .stCheckbox div[role="checkbox"] {
+        width: 22px;
+        height: 22px;
     }
     
+    /* Style the Button */
     .stButton button {
         background-color: #333 !important;
         border-radius: 25px !important;
         padding: 12px 40px !important;
         border: 1px solid #555 !important;
+        font-weight: bold;
+        letter-spacing: 1px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -134,7 +164,7 @@ current_combo = df_maps['combination'].unique()[0]
 # Initialize Session States safely
 for i in range(1, 5):
     if f's{i}' not in st.session_state: st.session_state[f's{i}'] = 3
-if 's5' not in st.session_state: st.session_state.s5 = 2
+if 's5_check' not in st.session_state: st.session_state.s5_check = False
 
 # Callback function for the randomize button
 def randomize_traits():
@@ -142,7 +172,7 @@ def randomize_traits():
     st.session_state.s2 = random.randint(1, 5)
     st.session_state.s3 = random.randint(1, 5)
     st.session_state.s4 = random.randint(1, 5)
-    st.session_state.s5 = random.choice([2, 4])
+    st.session_state.s5_check = random.choice([True, False])
 
 # --- 4. UI LAYOUT ---
 st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; margin-bottom:60px;'>POKÉMON DISCOVERY</h1>", unsafe_allow_html=True)
@@ -150,31 +180,40 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
+    # Add the requested TRAITS title
+    st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
+    
     meta = df_maps[df_maps['combination'] == current_combo].iloc[0]
     attrs = [meta[f'attr{i}_name'] for i in range(1, 6)]
     
-    def trait_row(label_pair, key, is_select=False):
-        st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
+    def trait_row(label_pair, key):
+        st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
         l_col, m_col, r_col = st.columns([1.2, 3, 1.2])
         l_col.markdown(f"<p class='side-label' style='text-align:right;'>{label_pair[0]}</p>", unsafe_allow_html=True)
         with m_col:
-            if is_select:
-                val = st.select_slider("", options=[2, 4], key=key, label_visibility="collapsed")
-            else:
-                val = st.slider("", 1, 5, key=key, label_visibility="collapsed")
+            # Using select_slider creates the visual tick markers on the track
+            val = st.select_slider("", options=[1, 2, 3, 4, 5], key=key, label_visibility="collapsed")
         r_col.markdown(f"<p class='side-label' style='text-align:left;'>{label_pair[1]}</p>", unsafe_allow_html=True)
         return val
 
+    # Top 4 sliders
     v1 = trait_row(TRAIT_LABELS[attrs[0]], "s1")
     v2 = trait_row(TRAIT_LABELS[attrs[1]], "s2")
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
-    v5 = trait_row(TRAIT_LABELS[attrs[4]], "s5", is_select=True)
+    
+    # 5th Trait is now the requested Checkbox
+    is_pretty = st.checkbox("PRETTY", key="s5_check")
+    v5 = 4 if is_pretty else 2
 
-    # Use the callback (on_click) so session state updates BEFORE sliders render
-    st.button('RANDOMIZE TRAITS', on_click=randomize_traits)
+    # Centered Randomize Button 
+    # Wrapping it in columns guarantees it centers perfectly beneath the sliders
+    _, btn_col, _ = st.columns([1, 2, 1])
+    with btn_col:
+        st.button('RANDOMIZE TRAITS', on_click=randomize_traits, use_container_width=True)
 
 with col1:
+    # --- MATCHING LOGIC ---
     match = df_maps[
         (df_maps['combination'] == current_combo) &
         (df_maps['attr1_val'] == v1) &
