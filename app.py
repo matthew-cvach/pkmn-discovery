@@ -24,7 +24,7 @@ st.markdown("""
     button[data-testid="baseLinkButton"],
     a.anchor-link { display: none !important; }
 
-    /* Pokémon Name Styling (LARGER) */
+    /* Pokémon Name Styling */
     .pkmn-name { 
         font-size: 4.5em; 
         font-weight: 900; 
@@ -35,7 +35,7 @@ st.markdown("""
         margin-bottom: 10px;
     }
     
-    /* The White Circle Container (LARGER) */
+    /* The White Circle Container */
     .img-circle {
         background-color: white;
         border-radius: 50%;
@@ -49,7 +49,6 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* Ensure the image inside the circle scales up */
     .img-circle img {
         max-width: 85%;
         max-height: 85%;
@@ -61,27 +60,22 @@ st.markdown("""
         height: 25px !important; 
     }
     
-    /* Center the slider thumb (handle) */
     .stSlider [data-baseweb="thumb"] {
         top: 5px !important; 
         width: 25px !important;
         height: 25px !important;
     }
 
-    /* Nuke the floating thumb values completely */
+    /* Nuke thumb values and keep tick bars invisible */
     div[data-testid="stThumbValue"] { 
         display: none !important; 
-        opacity: 0 !important;
     }
-    
-    /* Keep the visual tick marks, but make the text numbers under them invisible */
     div[data-testid="stTickBar"] > div {
         color: transparent !important;
-        user-select: none;
     }
 
     /* Side labels and Traits title size matching */
-    .side-label, .traits-title {
+    .side-label, .traits-title, .pretty-label {
         font-size: 13px;
         font-weight: 700;
         text-transform: uppercase;
@@ -95,22 +89,26 @@ st.markdown("""
     .traits-title {
         text-align: center;
         margin-bottom: 30px;
-        margin-top: 10px;
     }
 
-    /* Center the Checkbox block */
-    [data-testid="stCheckbox"] {
+    /* Centering the Checkbox and Label */
+    .pretty-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+    /* Remove default streamlit margins from the checkbox widget specifically */
+    [data-testid="stCheckbox"] {
+        width: fit-content;
+        margin: 0 auto;
     }
     
-    /* Center the Checkbox Label */
     .pretty-label {
         text-align: center;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 30px;
         margin-bottom: 5px;
     }
     
@@ -174,6 +172,9 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
+    # MOVE DOWN: Vertical spacer (approx 2 inches / 200px)
+    st.markdown("<div style='height: 200px;'></div>", unsafe_allow_html=True)
+    
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
     
     meta = df_maps[df_maps['combination'] == current_combo].iloc[0]
@@ -193,15 +194,16 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # Pretty Section: Centered Label + Centered Checkbox
+    # Pretty Section: Centered Label + Centered Checkbox below it
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
-    _, cb_col, _ = st.columns([1, 1, 1])
+    # Using a 1:1:1 column split helps force the checkbox to stay center aligned with the label
+    _, cb_col, _ = st.columns([2.15, 1, 2]) 
     with cb_col:
         is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     
     v5 = 4 if is_pretty else 2
 
-    st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
     _, btn_col, _ = st.columns([1, 2, 1])
     with btn_col:
         st.button('RANDOMIZE TRAITS', on_click=randomize_traits, use_container_width=True)
