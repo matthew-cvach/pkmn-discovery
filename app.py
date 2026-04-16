@@ -6,15 +6,21 @@ import os
 import re
 
 # --- 1. PAGE CONFIG & STYLING ---
-st.set_page_config(page_title="Pokemon Discovery", layout="wide")
+st.set_page_config(page_title="Pokémon Discovery", layout="wide")
 
-# Custom CSS for your specific requests
+# Custom CSS for your specific layout requests
 st.markdown("""
     <style>
     /* Dark Background */
-    .main { background-color: #1a1a1a; color: white; }
+    .stApp { background-color: #1a1a1a; color: white; }
     
-    /* Center the Pokemon Name */
+    /* Remove the 'link' icon next to headers */
+    .stApp [data-testid="stHeaderActionElements"] { display: none; }
+    button[data-testid="baseLinkButton"] { display: none; }
+    a.anchor-link { display: none !important; }
+    h1 a, h2 a, h3 a { visibility: hidden; }
+
+    /* Pokémon Name Styling */
     .pkmn-name { 
         font-size: 3.5em; 
         font-weight: 900; 
@@ -22,50 +28,57 @@ st.markdown("""
         text-transform: uppercase; 
         letter-spacing: -1px; 
         color: white; 
-        margin-bottom: 10px;
+        margin-top: 20px;
     }
     
-    /* Remove the Circle and center the image */
-    .img-container {
+    /* The White Circle Container */
+    .img-circle {
+        background-color: white;
+        border-radius: 50%;
+        width: 400px;
+        height: 400px;
         display: flex;
         justify-content: center;
         align-items: center;
         margin: 0 auto;
-        padding: 20px;
+        border: 4px solid #444;
+        overflow: hidden;
     }
 
-    /* Make sliders thicker */
+    /* Slider Thickness & Alignment */
     .stSlider [data-baseweb="slider"] {
-        height: 12px;
+        height: 18px; /* Thicker track */
     }
-    .stSlider [data-baseweb="slider"] div {
-        height: 12px;
+    /* Fixing the thumb (circle) vertical alignment */
+    .stSlider [data-baseweb="thumb"] {
+        top: 2px !important; 
     }
 
-    /* Hide the numbers (value) above the slider */
-    .stSlider [data-testid="stWidgetLabel"] p {
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    div[data-testid="stThumbValue"] {
-        display: none;
-    }
+    /* Hide ALL numbers/labels above sliders */
+    [data-testid="stWidgetLabel"] { display: none; }
+    [data-testid="stThumbValue"] { display: none; }
+    [data-testid="stSliderTickBar"] { display: none; }
     
-    /* Styling for the side labels */
+    /* Styling for the side labels to be level with sliders */
     .side-label {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
-        color: #888;
+        color: #bbb;
         text-transform: uppercase;
-        margin-top: 35px;
+        margin-top: 12px; /* Adjusted to level with thicker slider */
     }
     
     /* Center the button */
     .stButton {
         display: flex;
         justify-content: center;
+        margin-top: 30px;
+    }
+    .stButton button {
+        background-color: #333 !important;
+        color: white !important;
+        border-radius: 20px !important;
+        padding: 10px 30px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -90,35 +103,33 @@ TRAIT_LABELS = {
 }
 
 # --- 3. LOGIC & INITIALIZATION ---
-# Since we removed the combo slider, we pick the first available combo as default
 current_combo = df_maps['combination'].unique()[0]
 
+# Initialize Session States
+for i in range(1, 5):
+    if f's{i}' not in st.session_state: st.session_state[f's{i}'] = 3
+if 's5' not in st.session_state: st.session_state.s5 = 2
+
 # --- 4. UI LAYOUT ---
-st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; margin-bottom:50px;'>POKEMON DISCOVERY</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; margin-bottom:60px;'>POKÉMON DISCOVERY</h1>", unsafe_allow_html=True)
 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # Get current attribute names based on combo
     meta = df_maps[df_maps['combination'] == current_combo].iloc[0]
     attrs = [meta[f'attr{i}_name'] for i in range(1, 6)]
     
-    # Initialize Session States for Randomization
-    if 's1' not in st.session_state: st.session_state.s1 = 3
-    if 's2' not in st.session_state: st.session_state.s2 = 3
-    if 's3' not in st.session_state: st.session_state.s3 = 3
-    if 's4' not in st.session_state: st.session_state.s4 = 3
-    if 's5' not in st.session_state: st.session_state.s5 = 2
-
     # Sliders with side labels
     def trait_row(label_pair, key, is_select=False):
-        l_col, m_col, r_col = st.columns([1, 3, 1])
+        # Adding vertical padding/spacing using markdown
+        st.markdown("<div style='margin-bottom: 25px;'></div>", unsafe_allow_html=True)
+        l_col, m_col, r_col = st.columns([1.2, 3, 1.2])
         l_col.markdown(f"<p class='side-label' style='text-align:right;'>{label_pair[0]}</p>", unsafe_allow_html=True)
         with m_col:
             if is_select:
-                val = st.select_slider("", options=[2, 4], key=key)
+                val = st.select_slider("", options=[2, 4], key=key, label_visibility="collapsed")
             else:
-                val = st.slider("", 1, 5, key=key)
+                val = st.slider("", 1, 5, key=key, label_visibility="collapsed")
         r_col.markdown(f"<p class='side-label' style='text-align:left;'>{label_pair[1]}</p>", unsafe_allow_html=True)
         return val
 
@@ -128,7 +139,7 @@ with col2:
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     v5 = trait_row(TRAIT_LABELS[attrs[4]], "s5", is_select=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Centered Randomize Button
     if st.button('RANDOMIZE TRAITS'):
         st.session_state.s1 = random.randint(1, 5)
         st.session_state.s2 = random.randint(1, 5)
@@ -152,19 +163,27 @@ with col1:
         p = match.iloc[0]
         clean_name = re.sub(r'(?i)standard\s*', '', p['pokemon']).strip('- ').title()
         
+        # Name and Circle aligned horizontally in this column
         st.markdown(f'<h1 class="pkmn-name">{clean_name}</h1>', unsafe_allow_html=True)
         
         img_found = False
         for ext in ['png', 'jpg', 'jpeg', 'webp']:
             img_path = f"pokemon_artwork/{p['pokeapi_name_fixed']}.{ext}"
             if os.path.exists(img_path):
-                st.markdown('<div class="img-container">', unsafe_allow_html=True)
-                st.image(img_path, width=400)
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown(f'''
+                    <div class="img-circle">
+                        <img src="data:image/{ext};base64,{os.path.exists(img_path)}" style="width: 85%; height: auto;">
+                    </div>
+                ''', unsafe_allow_html=True)
+                # We use standard st.image inside the circle container for better cloud compatibility
+                with st.container():
+                    st.markdown('<div class="img-circle">', unsafe_allow_html=True)
+                    st.image(img_path, use_column_width=False, width=320)
+                    st.markdown('</div>', unsafe_allow_html=True)
                 img_found = True
                 break
         
         if not img_found:
             st.warning(f"Image for {p['pokeapi_name_fixed']} not found.")
     else:
-        st.markdown("<div style='text-align:center; margin-top:100px;'><h2>No mapping found.</h2></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; margin-top:150px;'><h2>No mapping found.</h2></div>", unsafe_allow_html=True)
