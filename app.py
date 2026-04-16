@@ -80,41 +80,38 @@ st.markdown("""
         user-select: none;
     }
 
-    /* Side labels leveled with the thick slider */
-    .side-label {
+    /* Side labels and Traits title size matching */
+    .side-label, .traits-title {
         font-size: 13px;
         font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    
+    .side-label {
         margin-top: 15px; 
     }
     
-    /* Traits Header */
     .traits-title {
         text-align: center;
-        letter-spacing: 5px;
-        font-weight: 300;
-        font-size: 2em;
         margin-bottom: 30px;
         margin-top: 10px;
     }
 
-    /* Centering and styling the Checkbox */
-    .stCheckbox {
-        display: flex;
+    /* Center the Checkbox block */
+    [data-testid="stCheckbox"] {
         justify-content: center;
-        margin-top: 15px;
-        margin-bottom: 25px;
     }
-    .stCheckbox label {
-        font-size: 1.4em !important;
-        font-weight: bold;
-        letter-spacing: 2px;
+    
+    /* Center the Checkbox Label */
+    .pretty-label {
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
         text-transform: uppercase;
-    }
-    /* Enlarge the actual checkbox box slightly */
-    .stCheckbox div[role="checkbox"] {
-        width: 22px;
-        height: 22px;
+        letter-spacing: 2px;
+        margin-top: 30px;
+        margin-bottom: 5px;
     }
     
     /* Style the Button */
@@ -136,7 +133,6 @@ def load_data():
 
 df_maps = load_data()
 
-# Helper to convert images to HTML-safe text so they stay inside the div
 def get_image_html(image_path, ext):
     with open(image_path, "rb") as img_file:
         encoded_string = base64.b64encode(img_file.read()).decode()
@@ -161,12 +157,10 @@ TRAIT_LABELS = {
 # --- 3. LOGIC & INITIALIZATION ---
 current_combo = df_maps['combination'].unique()[0]
 
-# Initialize Session States safely
 for i in range(1, 5):
     if f's{i}' not in st.session_state: st.session_state[f's{i}'] = 3
 if 's5_check' not in st.session_state: st.session_state.s5_check = False
 
-# Callback function for the randomize button
 def randomize_traits():
     st.session_state.s1 = random.randint(1, 5)
     st.session_state.s2 = random.randint(1, 5)
@@ -180,7 +174,6 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # Add the requested TRAITS title
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
     
     meta = df_maps[df_maps['combination'] == current_combo].iloc[0]
@@ -191,29 +184,29 @@ with col2:
         l_col, m_col, r_col = st.columns([1.2, 3, 1.2])
         l_col.markdown(f"<p class='side-label' style='text-align:right;'>{label_pair[0]}</p>", unsafe_allow_html=True)
         with m_col:
-            # Using select_slider creates the visual tick markers on the track
             val = st.select_slider("", options=[1, 2, 3, 4, 5], key=key, label_visibility="collapsed")
         r_col.markdown(f"<p class='side-label' style='text-align:left;'>{label_pair[1]}</p>", unsafe_allow_html=True)
         return val
 
-    # Top 4 sliders
     v1 = trait_row(TRAIT_LABELS[attrs[0]], "s1")
     v2 = trait_row(TRAIT_LABELS[attrs[1]], "s2")
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # 5th Trait is now the requested Checkbox
-    is_pretty = st.checkbox("PRETTY", key="s5_check")
+    # Pretty Section: Centered Label + Centered Checkbox
+    st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
+    _, cb_col, _ = st.columns([1, 1, 1])
+    with cb_col:
+        is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
+    
     v5 = 4 if is_pretty else 2
 
-    # Centered Randomize Button 
-    # Wrapping it in columns guarantees it centers perfectly beneath the sliders
+    st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
     _, btn_col, _ = st.columns([1, 2, 1])
     with btn_col:
         st.button('RANDOMIZE TRAITS', on_click=randomize_traits, use_container_width=True)
 
 with col1:
-    # --- MATCHING LOGIC ---
     match = df_maps[
         (df_maps['combination'] == current_combo) &
         (df_maps['attr1_val'] == v1) &
@@ -232,7 +225,6 @@ with col1:
         for ext in ['png', 'jpg', 'jpeg', 'webp']:
             img_path = f"pokemon_artwork/{p['pokeapi_name_fixed']}.{ext}"
             if os.path.exists(img_path):
-                # We use pure HTML/Base64 to guarantee the image stays IN the circle
                 html_block = get_image_html(img_path, ext)
                 st.markdown(html_block, unsafe_allow_html=True)
                 img_found = True
@@ -241,4 +233,4 @@ with col1:
         if not img_found:
             st.warning(f"Image for {p['pokeapi_name_fixed']} not found.")
     else:
-        st.markdown("<div style='text-align:center; margin-top:150px;'><h2>No mapping found.</h2></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; margin-top:200px;'><h2>No mapping found.</h2></div>", unsafe_allow_html=True)
