@@ -187,7 +187,9 @@ with col2:
     
     # Pretty Section - Using centered markdown for label and global CSS for the box
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
-    is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
+    _, check_col, _ = st.columns([1, 1, 1])
+    with check_col:
+        is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     
     v5 = 4 if is_pretty else 2
 
