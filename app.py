@@ -82,25 +82,25 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* THE FIX: Deep Centering for Checkbox */
+    /* ULTIMATE CHECKBOX CENTERING FIX */
     /* Target the base widget container */
     [data-testid="stCheckbox"] {
         display: flex !important;
         justify-content: center !important;
         width: 100% !important;
     }
-    /* Target the internal flex container that holds the box and the (empty) label */
+    /* Target the internal label that wraps the box icon */
     [data-testid="stCheckbox"] > label {
         display: flex !important;
         justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
+        width: auto !important;
+        padding-left: 0 !important;
+        margin: 0 auto !important;
     }
-    /* Remove the default margin-right that Streamlit adds to the checkbox icon */
-    [data-testid="stCheckbox"] div[role="checkbox"] {
+    /* Target the actual checkbox div to remove the phantom margin that holds space for text */
+    [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
         margin-right: 0px !important;
+        padding-right: 0px !important;
     }
     
     /* Style the Button */
@@ -163,7 +163,7 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # MOVE DOWN: Vertical spacer (approx 1 inch / 100px)
+    # Vertical spacer (1 inch / 100px)
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
@@ -185,9 +185,10 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # Pretty Section
+    # Pretty Section - Using centered markdown for label and global CSS for the box
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
     is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
+    
     v5 = 4 if is_pretty else 2
 
     st.markdown("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
