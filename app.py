@@ -55,18 +55,13 @@ st.markdown("""
         object-fit: contain;
     }
 
-    /* Slider Thickness & Alignment */
-    .stSlider [data-baseweb="slider"] {
-        height: 25px !important; 
-    }
-    
+    /* Slider Styling */
+    .stSlider [data-baseweb="slider"] { height: 25px !important; }
     .stSlider [data-baseweb="thumb"] {
         top: 5px !important; 
         width: 25px !important;
         height: 25px !important;
     }
-
-    /* Nuke thumb values and keep tick bars invisible */
     div[data-testid="stThumbValue"] { display: none !important; }
     div[data-testid="stTickBar"] > div { color: transparent !important; }
 
@@ -77,32 +72,32 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 2px;
     }
-    
     .side-label { margin-top: 15px; }
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* WAY 2: CSS CENTERING LOGIC */
-    /* This targets the checkbox and tells it to center within the FULL width of col2 */
+    /* WAY 2: POWER CENTER FIX */
+    /* This is the 'Way 2' logic. 
+       We target the parent container (the div that holds the checkbox) 
+       and force it to be 100% wide and use flex centering.
+    */
+    [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
     [data-testid="stCheckbox"] {
         display: flex !important;
         justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important; /* Take up the whole column */
+        width: fit-content !important;
         margin: 0 auto !important;
     }
-    [data-testid="stCheckbox"] > label {
-        display: inline-flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: fit-content !important;
-        padding: 0 !important;
-    }
-    /* Hide the text span so only the box remains to be centered */
+
     [data-testid="stCheckbox"] label > div + span {
         display: none !important;
     }
-    
+
     /* Style the Button */
     .stButton button {
         background-color: #333 !important;
@@ -210,7 +205,7 @@ with col2:
     # PRETTY SECTION - WAY 2
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
     
-    # We no longer use columns here. CSS handles the centering.
+    # Checkbox placed directly in col2. Centering is handled by CSS.
     is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     
     v5 = 4 if is_pretty else 2
