@@ -87,20 +87,26 @@ st.markdown("""
     [data-testid="stCheckbox"] {
         display: flex !important;
         justify-content: center !important;
+        align-items: center !important;
         width: 100% !important;
     }
     /* Target the internal label that wraps the box icon */
     [data-testid="stCheckbox"] > label {
-        display: flex !important;
+        display: inline-flex !important;
         justify-content: center !important;
-        width: auto !important;
-        padding-left: 0 !important;
+        align-items: center !important;
+        width: fit-content !important;
+        padding: 0 !important;
         margin: 0 auto !important;
     }
-    /* Target the actual checkbox div to remove the phantom margin that holds space for text */
+    /* Remove margin/padding from the baseweb checkbox div */
     [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
-        margin-right: 0px !important;
-        padding-right: 0px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    /* Hide the phantom label text span that causes off-center rendering */
+    [data-testid="stCheckbox"] label > div + span {
+        display: none !important;
     }
     
     /* Style the Button */
