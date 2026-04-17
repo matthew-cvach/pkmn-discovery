@@ -76,21 +76,30 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* CSS CENTERING LOGIC (WAY 2) */
-    /* Targets the parent wrapper to ensure the checkbox centers in the column */
+    /* --- CHECKBOX CENTERING LOGIC --- */
+    /* 1. Force the vertical block container to center the checkbox row */
     [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
         display: flex !important;
         justify-content: center !important;
         width: 100% !important;
     }
 
-    [data-testid="stCheckbox"] {
-        display: flex !important;
-        justify-content: center !important;
-        width: fit-content !important;
+    /* 2. Strip internal margins from the square box itself */
+    [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
+        margin-inline-end: 0px !important; 
         margin: 0 auto !important;
     }
 
+    /* 3. Center the label and remove standard gap for text */
+    [data-testid="stCheckbox"] label {
+        width: fit-content !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    /* 4. Hide the invisible text span */
     [data-testid="stCheckbox"] label > div + span {
         display: none !important;
     }
@@ -175,8 +184,9 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # PRETTY SECTION
+    # --- PRETTY SECTION ---
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
+    # CSS handles the alignment for this checkbox automatically
     is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     v5 = 4 if is_pretty else 2
 
