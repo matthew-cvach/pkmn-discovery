@@ -76,25 +76,31 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* --- THE "DEAD CENTER" FIX --- */
+    /* --- THE SHRINK-WRAP FIX --- */
     [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-    }
-
-    [data-testid="stCheckbox"] label {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         width: 100% !important;
-        margin: 0 !important;
+    }
+
+    [data-testid="stCheckbox"] label {
+        width: 16px !important; 
+        height: 16px !important;
+        min-height: 16px !important;
         padding: 0 !important;
-        gap: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: visible !important;
     }
 
     [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
         margin: 0 !important;
+        padding: 0 !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
     [data-testid="stCheckbox"] label > div + span {
@@ -109,6 +115,28 @@ st.markdown("""
         border: 1px solid #555 !important;
         font-weight: bold;
         letter-spacing: 1px;
+    }
+
+    /* ========================================= */
+    /* ULTIMATE X-RAY DEBUG: EVERY BOUNDARY      */
+    /* ========================================= */
+    div, span, label, section {
+        outline: 1px solid #333 !important;
+    }
+    [data-testid="column"] {
+        outline: 2px dashed #ff4b4b !important;
+    }
+    [data-testid="stHorizontalBlock"] {
+        outline: 2px solid #1c83e1 !important;
+    }
+    [data-testid="stCheckbox"] {
+        outline: 2px solid #28a745 !important;
+    }
+    .stSlider {
+        outline: 2px solid #ffa500 !important;
+    }
+    p, h1, h2, h3 {
+        outline: 1px dotted #a855f7 !important;
     }
     </style>
     """, unsafe_allow_html=True)
