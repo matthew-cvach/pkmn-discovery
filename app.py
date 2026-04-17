@@ -76,7 +76,7 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* --- GHOST HUNTER FIX --- */
+    /* --- THE FINAL CENTERING & CLEANUP --- */
     [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
         display: flex !important;
         justify-content: center !important;
@@ -101,6 +101,7 @@ st.markdown("""
         line-height: 0 !important;
     }
 
+    /* Kills the "dash" artifact and pseudo-elements */
     [data-testid="stCheckbox"] label::after, 
     [data-testid="stCheckbox"] label::before {
         content: none !important;
@@ -130,28 +131,6 @@ st.markdown("""
         border: 1px solid #555 !important;
         font-weight: bold;
         letter-spacing: 1px;
-    }
-
-    /* ========================================= */
-    /* ULTIMATE X-RAY DEBUG: EVERY BOUNDARY      */
-    /* ========================================= */
-    div, span, label, section {
-        outline: 1px solid #333 !important;
-    }
-    [data-testid="column"] {
-        outline: 2px dashed #ff4b4b !important;
-    }
-    [data-testid="stHorizontalBlock"] {
-        outline: 2px solid #1c83e1 !important;
-    }
-    [data-testid="stCheckbox"] {
-        outline: 2px solid #28a745 !important;
-    }
-    .stSlider {
-        outline: 2px solid #ffa500 !important;
-    }
-    p, h1, h2, h3 {
-        outline: 1px dotted #a855f7 !important;
     }
     </style>
     """, unsafe_allow_html=True)
