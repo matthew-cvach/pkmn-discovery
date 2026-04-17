@@ -1,5 +1,5 @@
 import streamlit as st
-import pandas as pd
+import pd as pd
 import numpy as np
 import random
 import os
@@ -116,29 +116,39 @@ st.markdown("""
     }
 
     /* ========================================= */
-    /* DEBUG MODE: VISUAL BOUNDARIES             */
+    /* ULTIMATE X-RAY DEBUG: EVERY BOUNDARY      */
     /* ========================================= */
     
-    /* 1. Main Columns (Red Dashed) */
+    /* Global boundary for every container */
+    div, span, label, section {
+        outline: 1px solid #333 !important;
+    }
+
+    /* 1. Main Columns (Red Dashed) - col1 and col2 */
     [data-testid="column"] {
         outline: 2px dashed #ff4b4b !important;
         background-color: rgba(255, 75, 75, 0.05) !important;
     }
 
-    /* 2. Sub-columns inside the Checkbox row (Blue Solid) */
-    [data-testid="stHorizontalBlock"] [data-testid="column"] {
+    /* 2. Horizontal Blocks (Blue Solid) - Rows inside columns */
+    [data-testid="stHorizontalBlock"] {
         outline: 2px solid #1c83e1 !important;
     }
 
-    /* 3. The actual Checkbox area (Green) */
+    /* 3. The Checkbox Area (Green) */
     [data-testid="stCheckbox"] {
-        outline: 1px solid #28a745 !important;
+        outline: 2px solid #28a745 !important;
         background-color: rgba(40, 167, 69, 0.1) !important;
     }
 
     /* 4. The Sliders (Orange) */
     .stSlider {
-        outline: 1px solid #ffa500 !important;
+        outline: 2px solid #ffa500 !important;
+    }
+
+    /* 5. Text Blocks (Purple Dotted) */
+    p, h1, h2, h3 {
+        outline: 1px dotted #a855f7 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -146,7 +156,7 @@ st.markdown("""
 # --- 2. DATA LOAD & HELPERS ---
 @st.cache_data
 def load_data():
-    # Make sure this CSV exists in your folder!
+    # Ensure this file exists in your working directory
     return pd.read_csv('top_10_pokemon_mappings.csv')
 
 df_maps = load_data()
@@ -192,7 +202,7 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # Vertical spacer
+    # Vertical spacer visible as a box in debug mode
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
@@ -202,6 +212,7 @@ with col2:
     
     def trait_row(label_pair, key):
         st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
+        # These 3 columns will be outlined in Blue
         l_col, m_col, r_col = st.columns([1.2, 3, 1.2])
         l_col.markdown(f"<p class='side-label' style='text-align:right;'>{label_pair[0]}</p>", unsafe_allow_html=True)
         with m_col:
@@ -214,10 +225,11 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # Checkbox Section
+    # Checkbox Section - Observe the 3 Blue boxes here
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
     _, check_col, _ = st.columns([1, 1, 1])
     with check_col:
+        # This checkbox will be outlined in Green
         is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
     
     v5 = 4 if is_pretty else 2
@@ -228,6 +240,7 @@ with col2:
         st.button('RANDOMIZE TRAITS', on_click=randomize_traits, use_container_width=True)
 
 with col1:
+    # This filter calculates which Pokémon to show based on trait values
     match = df_maps[
         (df_maps['combination'] == current_combo) &
         (df_maps['attr1_val'] == v1) &
