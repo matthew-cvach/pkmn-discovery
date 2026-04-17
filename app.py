@@ -76,12 +76,16 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* --- THE SHRINK-WRAP FIX --- */
+    /* --- GHOST HUNTER FIX --- */
     [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
         display: flex !important;
         justify-content: center !important;
-        align-items: center !important;
         width: 100% !important;
+    }
+
+    [data-testid="stCheckbox"] {
+        width: fit-content !important;
+        margin: 0 auto !important;
     }
 
     [data-testid="stCheckbox"] label {
@@ -93,7 +97,14 @@ st.markdown("""
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        overflow: visible !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+    }
+
+    [data-testid="stCheckbox"] label::after, 
+    [data-testid="stCheckbox"] label::before {
+        content: none !important;
+        display: none !important;
     }
 
     [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
@@ -101,6 +112,10 @@ st.markdown("""
         padding: 0 !important;
         width: 16px !important;
         height: 16px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
     }
 
     [data-testid="stCheckbox"] label > div + span {
