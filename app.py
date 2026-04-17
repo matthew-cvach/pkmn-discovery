@@ -76,11 +76,8 @@ st.markdown("""
     .traits-title { text-align: center; margin-bottom: 30px; }
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
-    /* WAY 2: POWER CENTER FIX */
-    /* This is the 'Way 2' logic. 
-       We target the parent container (the div that holds the checkbox) 
-       and force it to be 100% wide and use flex centering.
-    */
+    /* CSS CENTERING LOGIC (WAY 2) */
+    /* Targets the parent wrapper to ensure the checkbox centers in the column */
     [data-testid="stVerticalBlock"] > div:has([data-testid="stCheckbox"]) {
         display: flex !important;
         justify-content: center !important;
@@ -106,30 +103,6 @@ st.markdown("""
         border: 1px solid #555 !important;
         font-weight: bold;
         letter-spacing: 1px;
-    }
-
-    /* ========================================= */
-    /* ULTIMATE X-RAY DEBUG: EVERY BOUNDARY      */
-    /* ========================================= */
-    div, span, label, section {
-        outline: 1px solid #333 !important;
-    }
-    [data-testid="column"] {
-        outline: 2px dashed #ff4b4b !important;
-        background-color: rgba(255, 75, 75, 0.05) !important;
-    }
-    [data-testid="stHorizontalBlock"] {
-        outline: 2px solid #1c83e1 !important;
-    }
-    [data-testid="stCheckbox"] {
-        outline: 2px solid #28a745 !important;
-        background-color: rgba(40, 167, 69, 0.1) !important;
-    }
-    .stSlider {
-        outline: 2px solid #ffa500 !important;
-    }
-    p, h1, h2, h3 {
-        outline: 1px dotted #a855f7 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -202,12 +175,9 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # PRETTY SECTION - WAY 2
+    # PRETTY SECTION
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
-    
-    # Checkbox placed directly in col2. Centering is handled by CSS.
     is_pretty = st.checkbox("", key="s5_check", label_visibility="collapsed")
-    
     v5 = 4 if is_pretty else 2
 
     st.markdown("<div style='margin-bottom: 40px;'></div>", unsafe_allow_html=True)
