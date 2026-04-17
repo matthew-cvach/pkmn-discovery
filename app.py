@@ -83,14 +83,12 @@ st.markdown("""
     .pretty-label { text-align: center; margin-bottom: 10px; margin-top: 30px; }
 
     /* ULTIMATE CHECKBOX CENTERING FIX */
-    /* Target the base widget container */
     [data-testid="stCheckbox"] {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         width: 100% !important;
     }
-    /* Target the internal label that wraps the box icon */
     [data-testid="stCheckbox"] > label {
         display: inline-flex !important;
         justify-content: center !important;
@@ -99,12 +97,10 @@ st.markdown("""
         padding: 0 !important;
         margin: 0 auto !important;
     }
-    /* Remove margin/padding from the baseweb checkbox div */
     [data-testid="stCheckbox"] div[data-baseweb="checkbox"] {
         margin: 0 !important;
         padding: 0 !important;
     }
-    /* Hide the phantom label text span that causes off-center rendering */
     [data-testid="stCheckbox"] label > div + span {
         display: none !important;
     }
@@ -118,12 +114,39 @@ st.markdown("""
         font-weight: bold;
         letter-spacing: 1px;
     }
+
+    /* ========================================= */
+    /* DEBUG MODE: VISUAL BOUNDARIES             */
+    /* ========================================= */
+    
+    /* 1. Main Columns (Red Dashed) */
+    [data-testid="column"] {
+        outline: 2px dashed #ff4b4b !important;
+        background-color: rgba(255, 75, 75, 0.05) !important;
+    }
+
+    /* 2. Sub-columns inside the Checkbox row (Blue Solid) */
+    [data-testid="stHorizontalBlock"] [data-testid="column"] {
+        outline: 2px solid #1c83e1 !important;
+    }
+
+    /* 3. The actual Checkbox area (Green) */
+    [data-testid="stCheckbox"] {
+        outline: 1px solid #28a745 !important;
+        background-color: rgba(40, 167, 69, 0.1) !important;
+    }
+
+    /* 4. The Sliders (Orange) */
+    .stSlider {
+        outline: 1px solid #ffa500 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 # --- 2. DATA LOAD & HELPERS ---
 @st.cache_data
 def load_data():
+    # Make sure this CSV exists in your folder!
     return pd.read_csv('top_10_pokemon_mappings.csv')
 
 df_maps = load_data()
@@ -169,7 +192,7 @@ st.markdown("<h1 style='text-align:center; font-weight:200; letter-spacing:8px; 
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col2:
-    # Vertical spacer (1 inch / 100px)
+    # Vertical spacer
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     
     st.markdown("<h2 class='traits-title'>TRAITS</h2>", unsafe_allow_html=True)
@@ -191,7 +214,7 @@ with col2:
     v3 = trait_row(TRAIT_LABELS[attrs[2]], "s3")
     v4 = trait_row(TRAIT_LABELS[attrs[3]], "s4")
     
-    # Pretty Section - Using centered markdown for label and global CSS for the box
+    # Checkbox Section
     st.markdown("<p class='pretty-label'>PRETTY</p>", unsafe_allow_html=True)
     _, check_col, _ = st.columns([1, 1, 1])
     with check_col:
